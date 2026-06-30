@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GG Tiles | Account Registration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-950 text-gray-100 font-sans antialiased min-h-screen flex flex-col justify-between relative overflow-hidden">
+
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-600/5 rounded-full blur-[140px] pointer-events-none"></div>
+
+    <header class="p-6 max-w-7xl mx-auto w-full flex justify-between items-center relative z-10">
+        <div class="text-2xl font-serif font-black tracking-widest text-white">GG<span class="text-amber-500 font-sans font-light text-xl ml-1 border-l border-gray-800 pl-2 tracking-normal">TILES</span></div>
+    </header>
+
+    <main class="w-full max-w-md mx-auto p-4 relative z-10 my-auto">
+        <div class="bg-gray-900 border border-gray-800 p-8 rounded-3xl shadow-2xl">
+            
+            <div class="text-center mb-6">
+                <h1 class="text-2xl font-serif font-bold text-white tracking-wide">Create Account</h1>
+                <p class="text-gray-400 text-xs mt-1">Register to save house scaling maps and order premium tile samples.</p>
+            </div>
+
+            {% if msg %}
+            <div class="bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs p-3 rounded-xl mb-6 flex items-center space-x-2">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>{{ msg }}</span>
+            </div>
+            {% endif %}
+
+            <form action="/customer/register" method="POST" class="space-y-5">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Full Name</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-3.5 text-gray-500 text-sm"><i class="fa-solid fa-id-card"></i></span>
+                        <input type="text" name="name" required placeholder="Amit Sharma" class="w-full bg-gray-950 border border-gray-800 text-white pl-11 pr-4 py-3 rounded-xl focus:border-amber-500 outline-none text-sm font-medium shadow-inner">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Email Address</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-3.5 text-gray-500 text-sm"><i class="fa-solid fa-envelope"></i></span>
+                        <input type="email" name="email" required placeholder="amit@gmail.com" class="w-full bg-gray-950 border border-gray-800 text-white pl-11 pr-4 py-3 rounded-xl focus:border-amber-500 outline-none text-sm font-medium shadow-inner">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Password</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-3.5 text-gray-500 text-sm"><i class="fa-solid fa-key"></i></span>
+                        <input type="password" name="password" required placeholder="Choose a strong password" class="w-full bg-gray-950 border border-gray-800 text-white pl-11 pr-4 py-3 rounded-xl focus:border-amber-500 outline-none text-sm font-medium shadow-inner">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold py-3.5 rounded-xl uppercase tracking-wider text-xs transition shadow-lg mt-4">
+                    Register New Profile
+                </button>
+            </form>
+
+            <div class="text-center mt-6 pt-6 border-t border-gray-800/60">
+                <p class="text-xs text-gray-400">Already registered? <a href="/customer/auth" class="text-amber-500 font-bold hover:underline">Log In Here</a></p>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="p-6 text-center text-xs text-gray-600">© 2026 GG Tiles India.</footer>
+</body>
+</html>

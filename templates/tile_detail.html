@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ tile['name'] }} | GG Tiles Specifications</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <a href="/" class="text-3xl font-serif font-black tracking-widest text-slate-900">GG<span class="text-blue-600 font-sans font-light text-2xl ml-1 border-l border-slate-200 pl-2 tracking-normal">TILES</span></a>
+                <a href="/" class="text-sm font-bold text-slate-500 hover:text-blue-600 transition flex items-center"><i class="fa-solid fa-arrow-left-long mr-2"></i> Back to Showroom</a>
+            </div>
+        </div>
+    </nav>
+
+    {% set img_path = tile['image_url'] if 'http' in tile['image_url'] else url_for('static', filename=tile['image_url']) %}
+
+    <!-- Elaborate Product Information -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 py-12 w-full">
+        <div class="bg-white rounded-3xl shadow-lg border border-slate-200 overflow-hidden flex flex-col lg:flex-row mb-16">
+            
+            <!-- Left: High-Res Image -->
+            <div class="w-full lg:w-1/2 h-96 lg:h-auto relative bg-slate-100">
+                <img src="{{ img_path }}" class="w-full h-full object-cover" alt="{{ tile['name'] }}">
+                <div class="absolute top-6 left-6 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/20 shadow-lg flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full {% if tile['stock'] > 0 %}bg-emerald-500 animate-pulse{% else %}bg-red-500{% endif %}"></span>
+                    <span class="text-xs font-bold text-slate-800">{{ tile['stock'] }} Pallets Available</span>
+                </div>
+            </div>
+
+            <!-- Right: Details & Purchase Actions -->
+            <div class="w-full lg:w-1/2 p-10 flex flex-col justify-center">
+                <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1.5 rounded uppercase tracking-widest self-start mb-4 border border-blue-100">{{ tile['category'] }}</span>
+                <h1 class="text-4xl font-serif font-black text-slate-900 mb-2">{{ tile['name'] }}</h1>
+                <p class="text-2xl font-black text-blue-700 mb-6">₹{{ tile['price'] }} <span class="text-sm text-slate-400 font-normal">/ sq ft</span></p>
+                
+                <p class="text-slate-600 mb-8 leading-relaxed">{{ tile['description'] }} Built for modern architectural spaces requiring premium durability and aesthetic brilliance.</p>
+                
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Dimensions</span>
+                        <span class="text-sm font-bold text-slate-800">{{ tile['size'] }}</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Finish Grade</span>
+                        <span class="text-sm font-bold text-slate-800">Premium Grade A</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="/checkout/{{ tile['id'] }}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl uppercase tracking-wider transition shadow-lg text-center flex items-center justify-center">
+                        <i class="fa-solid fa-cart-shopping mr-2"></i> Proceed to Buy
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Collections -->
+        <h2 class="text-2xl font-serif font-black text-slate-900 mb-8 border-b border-slate-200 pb-4">Related Collections</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {% for rel_tile in related_tiles %}
+            {% set rel_img = rel_tile['image_url'] if 'http' in rel_tile['image_url'] else url_for('static', filename=rel_tile['image_url']) %}
+            <a href="/tile/{{ rel_tile['id'] }}" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition group">
+                <div class="h-40 overflow-hidden relative">
+                    <img src="{{ rel_img }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                </div>
+                <div class="p-4">
+                    <h3 class="font-bold text-slate-900 text-sm truncate">{{ rel_tile['name'] }}</h3>
+                    <p class="text-xs text-blue-600 font-bold mt-1">₹{{ rel_tile['price'] }} / sqft</p>
+                </div>
+            </a>
+            {% else %}
+            <p class="text-slate-500 text-sm">No other collections available in this category yet.</p>
+            {% endfor %}
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-8 mt-auto w-full">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="text-xl font-serif font-black tracking-widest text-slate-300 mb-4 md:mb-0">
+                GG<span class="text-blue-200 font-sans font-light ml-1 border-l border-slate-100 pl-2">TILES</span>
+            </div>
+            <div class="flex space-x-8">
+                <a href="/about" class="text-sm font-black text-blue-600 hover:text-blue-800 transition uppercase tracking-wider flex items-center">
+                    About Us <i class="fa-solid fa-arrow-right ml-2 text-[10px]"></i>
+                </a>
+                <a href="/privacy" class="text-sm font-bold text-slate-400 hover:text-slate-600 transition">Privacy</a>
+                <a href="/support" class="text-sm font-bold text-slate-400 hover:text-slate-600 transition">Support</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

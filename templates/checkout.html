@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secure Checkout | GG Tiles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen">
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 h-20 flex justify-between items-center">
+            <div class="text-2xl font-serif font-black tracking-widest text-slate-900">GG<span class="text-blue-600 font-sans font-light text-xl ml-1 border-l border-slate-200 pl-2 tracking-normal">CHECKOUT</span></div>
+            <a href="/tile/{{ tile['id'] }}" class="text-sm font-bold text-slate-500 hover:text-blue-600 transition"><i class="fa-solid fa-xmark mr-1"></i> Cancel</a>
+        </div>
+    </nav>
+
+    {% set img_path = tile['image_url'] if 'http' in tile['image_url'] else url_for('static', filename=tile['image_url']) %}
+
+    <main class="max-w-5xl mx-auto px-4 py-12">
+        <form action="/order/{{ tile['id'] }}" method="POST" class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            
+            <!-- Left: Order Details & Shipping -->
+            <div class="lg:col-span-2 space-y-8">
+                
+                <!-- Calculator Feature -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+                    <h2 class="text-xl font-black text-slate-900 mb-6 border-b border-slate-100 pb-4"><i class="fa-solid fa-calculator text-blue-600 mr-2"></i> Coverage Calculator</h2>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total Square Footage Needed</label>
+                        <input type="number" id="sqftInput" name="sqft" value="100" min="10" oninput="updatePrice()" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl font-black text-xl text-blue-700 outline-none focus:border-blue-500 transition">
+                        <p class="text-xs text-slate-400 mt-2">* We recommend adding 10% for wastage and cuts.</p>
+                    </div>
+                </div>
+
+                <!-- Shipping Feature -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+                    <h2 class="text-xl font-black text-slate-900 mb-6 border-b border-slate-100 pb-4"><i class="fa-solid fa-truck text-blue-600 mr-2"></i> Freight Destination</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" placeholder="Full Name" required class="col-span-2 bg-slate-50 border p-3 rounded-xl text-sm font-medium">
+                        <input type="text" placeholder="Delivery Address" required class="col-span-2 bg-slate-50 border p-3 rounded-xl text-sm font-medium">
+                        <input type="text" placeholder="City" required class="bg-slate-50 border p-3 rounded-xl text-sm font-medium">
+                        <input type="text" placeholder="Pincode" required class="bg-slate-50 border p-3 rounded-xl text-sm font-medium">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Live Invoice Summary -->
+            <div class="lg:col-span-1">
+                <div class="bg-slate-900 text-white rounded-3xl shadow-xl p-8 sticky top-28">
+                    <h2 class="text-lg font-bold mb-6 border-b border-slate-700 pb-4">Order Summary</h2>
+                    
+                    <div class="flex items-center space-x-4 mb-6">
+                        <img src="{{ img_path }}" class="w-16 h-16 rounded-lg object-cover border border-slate-700">
+                        <div>
+                            <h3 class="font-bold text-sm">{{ tile['name'] }}</h3>
+                            <p class="text-xs text-slate-400">₹<span id="basePrice">{{ tile['price'] }}</span> / sq ft</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 text-sm text-slate-300 font-medium mb-6 border-b border-slate-700 pb-6">
+                        <div class="flex justify-between"><span>Material Cost</span> <span id="matCost">₹0.00</span></div>
+                        <div class="flex justify-between"><span>Freight Delivery</span> <span class="text-emerald-400">FREE</span></div>
+                        <div class="flex justify-between"><span>GST (18%)</span> <span id="taxCost">₹0.00</span></div>
+                    </div>
+
+                    <div class="flex justify-between items-end mb-8">
+                        <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">Total</span>
+                        <span class="text-3xl font-black text-white" id="totalCost">₹0.00</span>
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl uppercase tracking-widest transition shadow-lg flex items-center justify-center">
+                        <i class="fa-solid fa-lock mr-2"></i> Confirm Order
+                    </button>
+                    <p class="text-[10px] text-center text-slate-500 mt-4"><i class="fa-solid fa-shield-halved mr-1"></i> 256-bit SSL Secure Encrypted Checkout</p>
+                </div>
+            </div>
+
+        </form>
+    </main>
+    <footer class="bg-white border-t border-slate-200 py-8 mt-auto w-full">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="text-xl font-serif font-black tracking-widest text-slate-300 mb-4 md:mb-0">
+                GG<span class="text-blue-200 font-sans font-light ml-1 border-l border-slate-100 pl-2">TILES</span>
+            </div>
+            <div class="flex space-x-8">
+                <a href="/about" class="text-sm font-black text-blue-600 hover:text-blue-800 transition uppercase tracking-wider flex items-center">
+                    About Us <i class="fa-solid fa-arrow-right ml-2 text-[10px]"></i>
+                </a>
+                <a href="/privacy" class="text-sm font-bold text-slate-400 hover:text-slate-600 transition">Privacy</a>
+                <a href="/support" class="text-sm font-bold text-slate-400 hover:text-slate-600 transition">Support</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const pricePerSqft = parseFloat(document.getElementById('basePrice').innerText);
+        
+        function updatePrice() {
+            const sqft = parseFloat(document.getElementById('sqftInput').value) || 0;
+            const matCost = sqft * pricePerSqft;
+            const tax = matCost * 0.18;
+            const total = matCost + tax;
+
+            document.getElementById('matCost').innerText = '₹' + matCost.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('taxCost').innerText = '₹' + tax.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('totalCost').innerText = '₹' + total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+        
+        // Run on load
+        updatePrice();
+    </script>
+</body>
+</html>

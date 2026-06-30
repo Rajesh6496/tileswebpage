@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Shop premium tiles, marbles, and architectural surfaces at GG Tiles. Use our 3D visualizer and buy directly from our wholesale warehouse.">
+    <title>GG Tiles | Premium Architectural Surfaces</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .floor-layer { background-size: 40px 40px; transform: perspective(500px) rotateX(65deg); transform-origin: bottom; }
+        .wall-layer { background-size: 30px 20px; }
+        .roof-layer { background-size: 35px 25px; transform: perspective(400px) rotateX(-45deg); transform-origin: top; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #1d4ed8; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-80 bg-white text-slate-900 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out shadow-2xl flex flex-col justify-between border-r border-blue-100">
+        <div class="p-6 overflow-y-auto">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                <span class="text-xl font-bold text-blue-700 tracking-wider font-serif">GG TILES MENU</span>
+                <button onclick="toggleSidebar()" class="text-slate-400 hover:text-blue-600 text-xl transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <nav class="space-y-2">
+                <button onclick="showPage('catalog-view')" class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-medium transition text-left">
+                    <i class="fa-solid fa-layer-group text-blue-600 w-5"></i><span>Main Showroom</span>
+                </button>
+                <button onclick="showPage('calculator-view')" class="w-full flex items-center space-x-3 p-3 rounded-xl bg-blue-50 border border-blue-100 text-blue-700 hover:bg-blue-100/70 transition font-semibold text-left shadow-xs">
+                    <i class="fa-solid fa-compass-drafting text-blue-600 w-5"></i><span>Scale Your House</span>
+                </button>
+            </nav>
+
+            <div class="mt-8 pt-6 border-t border-slate-100">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block px-2">Browse Collections</span>
+                <div class="space-y-1">
+                    <button onclick="filterMaterial('living-floor'); toggleSidebar();" class="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-slate-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition text-left font-medium"><i class="fa-solid fa-gem text-blue-400 w-4"></i><span>Luxury Marbles</span></button>
+                    <button onclick="filterMaterial('bath-wall'); toggleSidebar();" class="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-slate-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition text-left font-medium"><i class="fa-solid fa-droplet text-teal-400 w-4"></i><span>Ceramic Walls</span></button>
+                    <button onclick="filterMaterial('kitchen'); toggleSidebar();" class="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-slate-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition text-left font-medium"><i class="fa-solid fa-fire-burner text-emerald-400 w-4"></i><span>Kitchen Subway</span></button>
+                    <button onclick="filterMaterial('outdoor'); toggleSidebar();" class="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-slate-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition text-left font-medium"><i class="fa-solid fa-leaf text-orange-400 w-4"></i><span>Outdoor Paving</span></button>
+                    <button onclick="filterMaterial('roof'); toggleSidebar();" class="w-full flex items-center space-x-3 px-3 py-2.5 text-sm text-slate-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition text-left font-medium"><i class="fa-solid fa-house text-slate-400 w-4"></i><span>Roofing</span></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-slate-100 bg-slate-50 flex flex-col space-y-2">
+            {% if session.get('customer_name') %}
+                <div class="flex items-center space-x-3 px-2 py-1">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow">{{ session['customer_name'][0].upper() }}</div>
+                    <div class="truncate">
+                        <p class="text-xs text-slate-400 font-medium leading-none">Logged in as</p>
+                        <p class="text-sm font-bold text-slate-800 truncate mt-1">{{ session['customer_name'] }}</p>
+                    </div>
+                </div>
+                <a href="/logout" class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition text-center border border-red-200/40 flex items-center justify-center space-x-2"><i class="fa-solid fa-power-off text-xs"></i><span>Logout</span></a>
+            {% else %}
+                <a href="/customer/auth" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition text-center shadow-md flex items-center justify-center space-x-2"><i class="fa-solid fa-arrow-right-to-bracket text-xs"></i><span>Sign In</span></a>
+            {% endif %}
+            <a href="/admin/login" class="w-full bg-white hover:bg-slate-100 border border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-800 font-bold py-2 rounded-xl text-[11px] uppercase tracking-wider transition text-center flex items-center justify-center space-x-2 shadow-xs"><i class="fa-solid fa-user-shield text-blue-600"></i><span>Admin Portal</span></a>
+        </div>
+    </div>
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/40 z-40 hidden backdrop-blur-xs"></div>
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleSidebar()" class="text-blue-600 hover:text-blue-700 text-2xl p-2 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-300 transition shadow-inner"><i class="fa-solid fa-bars-staggered"></i></button>
+                    <div class="text-3xl font-serif font-black tracking-widest text-slate-900">GG<span class="text-blue-600 font-sans font-light text-2xl ml-1 border-l border-slate-200 pl-2 tracking-normal">TILES</span></div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    {% if session.get('customer_name') %}
+                        <div class="hidden md:flex items-center space-x-2 text-sm bg-blue-50/60 text-blue-700 px-4 py-2 rounded-xl border border-blue-100 font-medium"><span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse mr-1"></span><span>Active: {{ session['customer_name'] }}</span></div>
+                    {% else %}
+                        <a href="/customer/auth" class="text-slate-600 hover:text-blue-600 transition font-bold text-sm flex items-center"><i class="fa-solid fa-user-circle mr-1.5 text-lg text-blue-600"></i> Customer Portal</a>
+                    {% endif %}
+                    <button onclick="toggleSidebar()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-blue-600/10 transition text-sm flex items-center"><i class="fa-solid fa-house-chimney-window mr-2"></i> Scale House</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main id="catalog-view" class="page-section flex-grow">
+        <header class="bg-gradient-to-r from-blue-700 to-blue-800 text-white py-16 px-4 text-center relative overflow-hidden shadow-md">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.1),transparent_60%)]"></div>
+            <h1 class="text-4xl md:text-5xl font-serif font-black tracking-tight mb-3">PURE ARCHITECTURAL SURFACES</h1>
+            <p class="text-blue-100 text-sm md:text-base max-w-xl mx-auto">Experience our tiles mapped cleanly into real-world empty spaces.</p>
+        </header>
+
+        <div class="bg-white border-b border-slate-200 sticky top-20 z-20 shadow-xs">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                
+                <div class="flex overflow-x-auto space-x-3 scrollbar-hide flex-grow">
+                    <button onclick="filterMaterial('all')" class="mat-tab bg-blue-600 text-white font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl transition shadow border border-blue-700 whitespace-nowrap">All</button>
+                    <button onclick="filterMaterial('living-floor')" class="mat-tab bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl transition border border-slate-200 whitespace-nowrap">Marbles</button>
+                    <button onclick="filterMaterial('bath-wall')" class="mat-tab bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl transition border border-slate-200 whitespace-nowrap">Ceramics</button>
+                    <button onclick="filterMaterial('outdoor')" class="mat-tab bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl transition border border-slate-200 whitespace-nowrap">Slates</button>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                    <div class="relative w-full sm:w-64">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fa-solid fa-magnifying-glass text-slate-400"></i></div>
+                        <input type="text" id="searchInput" onkeyup="searchAndFilter()" placeholder="Search..." class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block pl-10 p-2.5 outline-none transition font-medium shadow-inner">
+                    </div>
+                    
+                    <select id="priceFilter" onchange="searchAndFilter()" class="w-full sm:w-40 bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl p-2.5 font-bold outline-none focus:ring-blue-500 focus:border-blue-500 shadow-inner cursor-pointer">
+                        <option value="all">Any Price</option>
+                        <option value="50">Below ₹50 / sqft</option>
+                        <option value="100">Below ₹100 / sqft</option>
+                        <option value="1000">Above ₹100 / sqft</option>
+                    </select>
+                </div>
+                
+            </div>
+        </div>
+
+        <section class="max-w-7xl mx-auto px-4 py-12 mb-12 min-h-[400px]">
+            
+            <div id="out-of-stock-msg" class="hidden text-center py-20 bg-slate-100 rounded-3xl border border-slate-200 border-dashed">
+                <i class="fa-solid fa-box-open text-5xl text-slate-300 mb-4 block"></i>
+                <h2 class="text-2xl font-black text-slate-800 font-serif">Your searched materials are out of stock.</h2>
+                <button onclick="document.getElementById('searchInput').value=''; document.getElementById('priceFilter').value='all'; searchAndFilter();" class="mt-6 text-sm font-bold text-blue-600 hover:underline">Clear Filters</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10" id="masterGrid">
+                
+                {% for tile in tiles %}
+                <div class="tile-item bg-white rounded-3xl shadow-lg border border-slate-200 overflow-hidden group flex flex-col justify-between" data-material="{{ tile['category'] }}" data-price="{{ tile['price'] }}">
+                    <div class="w-full h-80 bg-slate-100 relative overflow-hidden group">
+                        
+                        <a href="/tile/{{ tile['id'] }}" class="absolute inset-0 z-10 cursor-pointer"></a>
+                        
+                        {% set img_path = tile['image_url'] if 'http' in tile['image_url'] else url_for('static', filename=tile['image_url']) %}
+                        <img src="{{ img_path }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" alt="{{ tile['name'] }}">
+                        
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent pointer-events-none"></div>
+                        <div class="absolute bottom-6 left-6 right-6 flex justify-between items-end pointer-events-none">
+                            <div class="relative z-20">
+                                <span class="text-[10px] font-black text-white bg-blue-600 px-2 py-1 rounded tracking-widest uppercase shadow">{{ tile['category'] }}</span>
+                                <h3 class="text-2xl font-serif font-bold text-white mt-2 drop-shadow-md tile-title">{{ tile['name'] }}</h3>
+                                <p class="text-sm text-slate-200 mt-1 tile-desc">{{ tile['size'] }} | {{ tile['description'] }}</p>
+                            </div>
+                        </div>
+                        <div class="absolute top-6 left-6 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/20 shadow-lg flex items-center space-x-2 relative z-20 pointer-events-none">
+                            <span class="w-2 h-2 rounded-full {% if tile['stock'] > 0 %}bg-emerald-500 animate-pulse{% else %}bg-red-500{% endif %}"></span>
+                            <span class="text-xs font-bold text-slate-800">Stock: {{ tile['stock'] }} Pallets</span>
+                        </div>
+                    </div>
+
+                    <div class="p-6 flex justify-between items-center bg-white">
+                        <span class="text-2xl font-black text-blue-700">₹{{ tile['price'] }} <span class="text-xs text-slate-400 font-normal">/ sq ft</span></span>
+                        <button onclick='openVisualizer( tile["name"]|tojson , "{{ img_path }}")' class="bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold px-6 py-3 rounded-xl transition shadow-sm border border-blue-100 flex items-center z-20 relative">
+                            <i class="fa-solid fa-cube mr-2"></i> Open Constructor
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+        </section>
+    </main>
+
+    <div id="visualizerModal" class="fixed inset-0 bg-slate-900/90 z-50 hidden flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-white rounded-3xl w-full max-w-5xl overflow-hidden shadow-2xl flex flex-col md:flex-row h-[85vh] border border-slate-100">
+            <div class="flex-1 bg-slate-100 relative p-6 flex flex-col justify-center items-center overflow-hidden min-h-[400px]">
+                <div class="w-80 h-96 relative flex flex-col justify-between items-center mt-8">
+                    <div id="houseRoof" class="w-full h-28 bg-slate-200 border-2 border-slate-300 roof-layer relative z-20 transition-all duration-300 shadow-md bg-cover bg-center"></div>
+                    <div id="houseWall" class="w-72 flex-1 bg-white border-x-4 border-b-4 border-slate-300 relative z-10 overflow-hidden flex flex-col justify-end shadow-inner">
+                        <div id="wallRenderSurface" class="absolute inset-0 wall-layer transition-all duration-300 bg-cover bg-center"></div>
+                        <div id="floorRenderSurface" class="w-full h-24 floor-layer border-t-2 border-slate-200 shadow-xl z-10 transition-all duration-300 bg-cover bg-center"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-80 bg-white p-8 flex flex-col justify-between border-l border-slate-200">
+                <div>
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase block">Constructor</span>
+                            <h2 class="text-2xl font-serif font-bold text-slate-900 leading-tight mt-1" id="visTileName">Material Sample</h2>
+                        </div>
+                        <button onclick="closeVisualizer()" class="text-slate-400 hover:text-blue-600 text-2xl transition"><i class="fa-solid fa-circle-xmark"></i></button>
+                    </div>
+                    <div class="space-y-4">
+                        <button onclick="applyToStructure('roof')" class="w-full bg-slate-50 border border-slate-200 hover:border-blue-500 p-4 rounded-xl text-left font-bold text-slate-800 transition">Apply to Roof</button>
+                        <button onclick="applyToStructure('wall')" class="w-full bg-slate-50 border border-slate-200 hover:border-blue-500 p-4 rounded-xl text-left font-bold text-slate-800 transition">Apply to Walls</button>
+                        <button onclick="applyToStructure('floor')" class="w-full bg-slate-50 border border-slate-200 hover:border-blue-500 p-4 rounded-xl text-left font-bold text-slate-800 transition">Apply to Floors</button>
+                    </div>
+                </div>
+                <button onclick="closeVisualizer()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl uppercase tracking-wider font-bold transition">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="calculator-view" class="page-section hidden max-w-4xl mx-auto px-4 py-12 flex-grow">
+        <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-200">
+            <h1 class="text-2xl font-serif font-black text-slate-900">GG TILES | SCALING CALCULATOR</h1>
+            <p class="text-slate-400 text-xs mb-6">Determine box pack coverage models instantly.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Length (Ft)</label>
+                    <input type="number" id="lenInput" value="15" oninput="calculateOutput()" class="w-full bg-slate-50 border p-3 rounded-xl font-bold">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Width (Ft)</label>
+                    <input type="number" id="widInput" value="12" oninput="calculateOutput()" class="w-full bg-slate-50 border p-3 rounded-xl font-bold">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Box Coverage</label>
+                    <input type="number" id="covInput" value="16" oninput="calculateOutput()" class="w-full bg-slate-50 border p-3 rounded-xl font-bold">
+                </div>
+            </div>
+            <div class="bg-slate-50 p-6 rounded-2xl grid grid-cols-3 gap-4 text-center font-mono">
+                <div class="bg-white p-2 rounded-xl border"><span class="block text-[10px] text-slate-400 font-bold">NET</span><span id="outNet" class="text-lg font-bold">180 sq ft</span></div>
+                <div class="bg-white p-2 rounded-xl border"><span class="block text-[10px] text-slate-400 font-bold">+10% WASTAGE</span><span id="outGross" class="text-lg font-bold text-blue-600">198 sq ft</span></div>
+                <div class="bg-blue-600 text-white p-2 rounded-xl font-bold flex flex-col justify-center shadow"><span class="text-[10px]">BOXES</span><span id="outBoxes" class="text-xl font-black">13</span></div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="text-xl font-serif font-black tracking-widest text-slate-300 mb-4 md:mb-0">
+                GG<span class="text-blue-200 font-sans font-light ml-1 border-l border-slate-100 pl-2">TILES</span>
+            </div>
+            <div class="flex space-x-8">
+                <a href="/about" class="text-sm font-black text-blue-600 hover:text-blue-800 transition uppercase tracking-wider flex items-center">
+                    About Us <i class="fa-solid fa-arrow-right ml-2 text-[10px]"></i>
+                </a>
+                <a href="/privacy" class="text-sm font-bold text-slate-400 hover:text-slate-600 transition">Privacy</a>
+                <a href="/support" class="text-sm font-bold text-slate-400 hover:text-slate-600 transition">Support</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let currentSelectedTileUrl = "";
+        
+        // --- MASTER SEARCH & PRICE FILTER FUNCTION ---
+        function searchAndFilter() {
+            let input = document.getElementById('searchInput').value.toLowerCase();
+            let priceLimit = document.getElementById('priceFilter').value;
+            let tiles = document.querySelectorAll('.tile-item');
+            let outOfStockMsg = document.getElementById('out-of-stock-msg');
+            let foundAny = false;
+
+            tiles.forEach(tile => {
+                let title = tile.querySelector('.tile-title').innerText.toLowerCase();
+                let desc = tile.querySelector('.tile-desc').innerText.toLowerCase();
+                let category = tile.getAttribute('data-material').toLowerCase();
+                let price = parseFloat(tile.getAttribute('data-price'));
+
+                let matchesSearch = title.includes(input) || desc.includes(input) || category.includes(input);
+                
+                let matchesPrice = (priceLimit === "all") || 
+                                   (priceLimit === "50" && price < 50) ||
+                                   (priceLimit === "100" && price < 100) ||
+                                   (priceLimit === "1000" && price >= 100);
+
+                if (matchesSearch && matchesPrice) {
+                    tile.style.display = 'flex';
+                    foundAny = true;
+                } else {
+                    tile.style.display = 'none';
+                }
+            });
+
+            if (foundAny) outOfStockMsg.classList.add('hidden');
+            else outOfStockMsg.classList.remove('hidden');
+        }
+
+        // --- EXISTING LOGIC ---
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
+        }
+        function showPage(pageId) {
+            document.querySelectorAll('.page-section').forEach(section => section.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+            if(document.getElementById('sidebar').classList.contains('-translate-x-full') === false) toggleSidebar();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function filterMaterial(matClass) {
+            document.getElementById('searchInput').value = "";
+            document.getElementById('priceFilter').value = "all";
+            document.getElementById('out-of-stock-msg').classList.add('hidden');
+
+            document.querySelectorAll('.tile-item').forEach(item => {
+                if(matClass === 'all' || item.getAttribute('data-material') === matClass) item.style.display = 'flex';
+                else item.style.display = 'none';
+            });
+            showPage('catalog-view');
+            
+            const tabs = document.querySelectorAll('.mat-tab');
+            tabs.forEach(tab => {
+                tab.className = "mat-tab bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl transition border border-slate-200 whitespace-nowrap";
+            });
+            try { event.currentTarget.className = "mat-tab bg-blue-600 text-white font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl transition shadow border border-blue-700 whitespace-nowrap"; } catch(e) {}
+        }
+        function openVisualizer(tileName, tileImgUrl) {
+            document.getElementById('visTileName').innerText = tileName;
+            currentSelectedTileUrl = tileImgUrl;
+            document.getElementById('visualizerModal').classList.remove('hidden');
+        }
+        function closeVisualizer() {
+            document.getElementById('visualizerModal').classList.add('hidden');
+            document.getElementById('houseRoof').style.backgroundImage = 'none';
+            document.getElementById('wallRenderSurface').style.backgroundImage = 'none';
+            document.getElementById('floorRenderSurface').style.backgroundImage = 'none';
+        }
+        function applyToStructure(zone) {
+            if(!currentSelectedTileUrl) return;
+            if(zone === 'roof') document.getElementById('houseRoof').style.backgroundImage = `url('${currentSelectedTileUrl}')`;
+            else if (zone === 'wall') document.getElementById('wallRenderSurface').style.backgroundImage = `url('${currentSelectedTileUrl}')`;
+            else if (zone === 'floor') document.getElementById('floorRenderSurface').style.backgroundImage = `url('${currentSelectedTileUrl}')`;
+        }
+        function calculateOutput() {
+            const l = parseFloat(document.getElementById('lenInput').value) || 0;
+            const w = parseFloat(document.getElementById('widInput').value) || 0;
+            const c = parseFloat(document.getElementById('covInput').value) || 1;
+            const net = l * w; const gross = net * 1.10;
+            document.getElementById('outNet').innerText = net.toFixed(1) + " sq ft";
+            document.getElementById('outGross').innerText = gross.toFixed(1) + " sq ft";
+            document.getElementById('outBoxes').innerText = Math.ceil(gross / c);
+        }
+    </script>
+</body>
+</html>
